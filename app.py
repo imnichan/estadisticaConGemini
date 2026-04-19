@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
+import google.generativeai as genai
 
 # --- CONFIGURACION DE LA PAGINA ---
 st.set_page_config(
@@ -94,7 +95,7 @@ if df is not None:
     cols_num = df.select_dtypes(include=[np.number]).columns.tolist()
     
     if cols_num:
-        col_target = st.selectbox("Selecciona la variable para analizar:", cols_num)
+        col_target = st.selectbox("Selecciona la variable para analizar:", cols_num, key="selector_analisis_visual")
         datos_limpios = df[col_target].dropna()
         
         c1, c2 = st.columns(2)
@@ -199,3 +200,41 @@ if df is not None and cols_num:
 
     progreso_val = 75
     bar_progreso.progress(progreso_val)
+
+# --- 7. INTEGRACION CON IA GENERATIVA (GEMINI) ---
+if df is not None and progreso_val >= 75:
+    st.divider()
+    st.header("🤖 4. Interpretacion con IA (Gemini)")
+    
+    # Configuracion de la API (Sustituye 'TU_API_KEY' por tu clave real)
+    genai.configure(api_key="AIzaSyDVySzXAcU60t0yh5JxLqAcEqAsOGTx5zE")
+    model = genai.GenerativeModel('gemini-pro')
+    
+    if st.button("Generar Analisis con IA"):
+        with st.spinner("Consultando a Gemini..."):
+            # Creamos un prompt tecnico y estructurado
+            prompt = f"""
+            Actua como un experto en estadistica. Analiza los siguientes resultados de una prueba Z:
+            - Hipotesis Nula (H0): mu = {mu_h0}
+            - Media Muestral: {media_muestral:.4f}
+            - Tamaño de Muestra: {n_muestral}
+            - Estadistico Z: {z_stat:.4f}
+            - Valor p: {p_val:.4f}
+            - Nivel de significancia (alpha): {alpha}
+            - Tipo de prueba: {tipo_cola}
+            
+            Indica si se rechaza o no la hipotesis, explica que significa esto en terminos sencillos 
+            y menciona si el tamaño de la muestra es suficiente para dar validez al resultado.
+            """
+            
+            try:
+                response = model.generate_content(prompt)
+                st.markdown("### Analisis de la IA:")
+                st.write(response.text)
+                
+                progreso_val = 100
+                bar_progreso.progress(progreso_val)
+                st.balloons()
+            except Exception as e:
+                st.error(f"Error al conectar con la API de Gemini: {e}")
+                st.info("Asegurate de que tu API Key sea valida y tengas conexion a internet.")
