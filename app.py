@@ -121,3 +121,42 @@ if df is not None:
         
     else:
         st.error("El dataset no contiene columnas numericas.")
+# --- 5. VISUALIZACION DE DISTRIBUCIONES ---
+if df is not None:
+    st.divider()
+    st.header("📊 2. Análisis Visual de la Distribución")
+    
+    # Filtrado de columnas numéricas
+    cols_num = df.select_dtypes(include=[np.number]).columns.tolist()
+    
+    if cols_num:
+        col_target = st.selectbox("Selecciona la variable para analizar:", cols_num)
+        
+        # Preparación de datos para graficar
+        datos_limpios = df[col_target].dropna()
+        
+        col_graf1, col_graf2 = st.columns(2)
+        
+        with col_graf1:
+            st.subheader("Histograma y KDE")
+            fig_h, ax_h = plt.subplots()
+            sns.histplot(datos_limpios, kde=True, color="steelblue", ax=ax_h)
+            ax_h.set_title("Distribución de Frecuencias")
+            st.pyplot(fig_h)
+            
+        with col_graf2:
+            st.subheader("Boxplot (Outliers)")
+            fig_b, ax_b = plt.subplots()
+            sns.boxplot(x=datos_limpios, color="coral", ax=ax_b)
+            ax_b.set_title("Detección de Valores Atípicos")
+            st.pyplot(fig_b)
+            
+        # Sección de autodiagnóstico
+        st.info("Responde las siguientes preguntas según lo observado en las gráficas:")
+        q1 = st.radio("¿La distribución parece ser Normal?", ["Sí", "No", "Incierto"])
+        q2 = st.radio("¿Se detectan valores atípicos (outliers)?", ["Sí", "No"])
+        
+        # Actualizar progreso
+        progreso = 50
+    else:
+        st.error("No se detectaron columnas numéricas para graficar.")
