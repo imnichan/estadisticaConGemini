@@ -212,6 +212,7 @@ if df is not None and progreso_val >= 75:
     genai.configure(api_key="AIzaSyDVySzXAcU60t0yh5JxLqAcEqAsOGTx5zE")
     model = genai.GenerativeModel('gemini-2.5-flash')
     
+    
     if st.button("Generar Analisis con IA"):
         with st.spinner("Consultando a Gemini..."):
             # Creamos un prompt tecnico y estructurado
