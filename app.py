@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy import stats
+import os
+from dotenv import load_dotenv
 import google.generativeai as genai
 
 # --- CONFIGURACION DE LA PAGINA ---
@@ -208,7 +210,7 @@ if df is not None and progreso_val >= 75:
     
     # Configuracion de la API (Sustituye 'TU_API_KEY' por tu clave real)
     genai.configure(api_key="AIzaSyDVySzXAcU60t0yh5JxLqAcEqAsOGTx5zE")
-    model = genai.GenerativeModel('gemini-pro')
+    model = genai.GenerativeModel('gemini-2.5-flash')
     
     if st.button("Generar Analisis con IA"):
         with st.spinner("Consultando a Gemini..."):
