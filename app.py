@@ -172,6 +172,8 @@ if df is not None and cols_num:
     st.header("🔢 3. Prueba de Hipótesis (Z-Test)")
     
     # Calculos estadisticos basicos
+    sigma = st.sidebar.number_input("Desviación estándar poblacional (σ)", value=15.0, step=1.0)
+    mu_h0 = st.sidebar.number_input("Media Hipotética (H0)", value=80.0)
     media_muestral = datos_limpios.mean()
     n_muestral = len(datos_limpios)
     # Suponemos varianza poblacional conocida segun los parametros del sidebar
