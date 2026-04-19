@@ -121,7 +121,9 @@ if df is not None:
         
     else:
         st.error("El dataset no contiene columnas numericas.")
+
 # --- 5. VISUALIZACION DE DISTRIBUCIONES ---
+
 if df is not None:
     st.divider()
     st.header("📊 2. Análisis Visual de la Distribución")
@@ -160,3 +162,40 @@ if df is not None:
         progreso = 50
     else:
         st.error("No se detectaron columnas numéricas para graficar.")
+    
+# --- 6. PRUEBA DE HIPOTESIS (PRUEBA Z) ---
+if df is not None and cols_num:
+    st.divider()
+    st.header("🔢 3. Prueba de Hipótesis (Z-Test)")
+    
+    # Calculos estadisticos basicos
+    media_muestral = datos_limpios.mean()
+    n_muestral = len(datos_limpios)
+    # Suponemos varianza poblacional conocida segun los parametros del sidebar
+    error_estandar = sigma / np.sqrt(n_muestral)
+    
+    # Calculo del Estadistico Z
+    z_stat = (media_muestral - mu_h0) / error_estandar
+    
+    # Calculo del P-value segun el tipo de prueba
+    if tipo_cola == "Bilateral (diff)":
+        p_val = 2 * (1 - stats.norm.cdf(abs(z_stat)))
+    elif tipo_cola == "Cola Derecha (>)":
+        p_val = 1 - stats.norm.cdf(z_stat)
+    else: # Cola Izquierda
+        p_val = stats.norm.cdf(z_stat)
+    
+    # Mostrar resultados en metricas
+    c_res1, c_res2, c_res3 = st.columns(3)
+    c_res1.metric("Estadistico Z", f"{z_stat:.4f}")
+    c_res2.metric("P-Value", f"{p_val:.4f}")
+    c_res3.metric("Decision", "Rechaza H0" if p_val < alpha else "No Rechaza H0")
+
+    # Interpretacion automatica
+    if p_val < alpha:
+        st.error(f"Resultado: Existen evidencias suficientes para rechazar la Hipotesis Nula (p < {alpha}).")
+    else:
+        st.success(f"Resultado: No existen evidencias suficientes para rechazar la Hipotesis Nula (p >= {alpha}).")
+
+    progreso_val = 75
+    bar_progreso.progress(progreso_val)
